@@ -15,6 +15,4 @@
  */
 if (!defined('SCHLIX_VERSION')) die('No Access');
 ?>
-<?php
-$this->JAVASCRIPT('scribd.js');
-?>
+<iframe width="100%" height="600" src="https://www.scribd.com/embeds/<?= ___($id)?>/content?start_page=1&view_mode=lis" frameborder="0"></iframe>

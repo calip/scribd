@@ -19,6 +19,31 @@ class ScribdEmbed extends \SCHLIX\cmsMacro {
 
     
     protected static $has_this_macro_been_called;
+    
+    private function processText($text) {
+        $regex = '/<[a-zA-Z][^>]*>(https?:\/\/(?:www\.)?scribd\.com\/(?:.*doc|document|presentation)\/([^\/]+).*?)<\/[a-zA-Z]>/';
+        preg_match_all($regex, $text, $matches);
+        
+        $match_count = count($matches[0]);
+        if ($match_count > 0) {
+            for ($i = 0; $i < $match_count; $i++) {
+                $tag = $matches[0][$i];
+                $url = $matches[1][$i];
+                $id = $matches[2][$i];
+                
+                if ($url != null && $id != null){
+                    
+                    start_output_buffer();
+                    $this->loadTemplateFile('view.macro', array('id' => $id), false);
+                    $replacement_tag = end_output_buffer();
+                    $text = str_replace($tag, $replacement_tag, $text);
+                }
+            }
+        }
+        static::$has_this_macro_been_called = 'yes';
+        return $text;
+    }
+    
     /*
      * Run the macro
      * @global \SCHLIX\cmsHTMLPageHeader $HTMLHeader
@@ -29,12 +54,20 @@ class ScribdEmbed extends \SCHLIX\cmsMacro {
      * @return bool
      */
     public function Run(&$data, $caller_object, $caller_function, $extra_info = NULL) {
-        if (static::$has_this_macro_been_called != 'yes')
-        {
-            $this->loadTemplateFile('view.macro', compact(array_keys(get_defined_vars())));
-            static::$has_this_macro_been_called = 'yes';
+        global $HTMLHeader;
+        if (static::$has_this_macro_been_called != 'yes'){
+
+            if (is_array($data)) { // don't enable it for block (string)
+                if (array_key_exists('summary', $data))
+                    $data['summary'] = $this->processText($data['summary']);
+                if (array_key_exists('description', $data))
+                    $data['description'] = $this->processText($data['description']);
+            } else{
+                $data = $this->processText($data);
+            }
+
+            return true;
         }
-        return true;
     }
 
 }

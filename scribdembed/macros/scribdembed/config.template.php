@@ -17,7 +17,7 @@ if (!defined('SCHLIX_VERSION'))
     die('No Access');
 ?>
 <p><?= ___('This macro is useful to embed a scribd documents in the middle of content text') ?></p>
-
+<p><?= ___('Get scribd documents <a href="https://www.scribd.com/docs" target="_blank">Click Here</a>.') ?></p>
 
 <h3><?= ___('Usage') ?></h3>
 <ul>
